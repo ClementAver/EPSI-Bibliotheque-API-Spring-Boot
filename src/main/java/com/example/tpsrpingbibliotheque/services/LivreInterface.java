@@ -2,6 +2,7 @@ package com.example.tpsrpingbibliotheque.services;
 
 import com.example.tpsrpingbibliotheque.dto.LivreRequestBody;
 import com.example.tpsrpingbibliotheque.entities.Livre;
+import com.example.tpsrpingbibliotheque.exeptions.LivreNonDisponibleExeption;
 
 import java.util.List;
 
@@ -10,5 +11,6 @@ public interface LivreInterface {
     List<Livre> getAllLivres();
     Livre getLivre(int id);
     void deleteLivre(int id);
+    void empruntLivre(int id, boolean emprunt, LivreRequestBody livreRequestBody) throws LivreNonDisponibleExeption;
 }
 
