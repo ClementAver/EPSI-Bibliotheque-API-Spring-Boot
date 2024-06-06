@@ -3,7 +3,6 @@ package com.example.tpsrpingbibliotheque.controllers;
 import com.example.tpsrpingbibliotheque.dto.LivreRequestBody;
 import com.example.tpsrpingbibliotheque.entities.Livre;
 import com.example.tpsrpingbibliotheque.services.LivreService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class LivreController {
 
-    // @Autowired
+    // @Autowired if no constructor.
     final private LivreService livreService;
 
     public LivreController(LivreService livreService) {
@@ -20,7 +19,7 @@ public class LivreController {
     }
 
     @GetMapping("/livres")
-    public List<Livre> getLivres(@RequestParam(name = "id", required=true) int id) {
+    public List<Livre> getLivres() {
         return livreService.getAllLivres();
     }
 

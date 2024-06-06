@@ -2,6 +2,7 @@ package com.example.tpsrpingbibliotheque.services;
 
 import com.example.tpsrpingbibliotheque.dto.LivreRequestBody;
 import com.example.tpsrpingbibliotheque.entities.Livre;
+import com.example.tpsrpingbibliotheque.repositories.LivreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,9 +10,9 @@ import java.util.List;
 @Service
 public class LivreService implements LivreInterface {
 
-    private com.example.tpsrpingbibliotheque.repositories.livreRepository livreRepository;
+    private LivreRepository livreRepository;
 
-    public LivreService(com.example.tpsrpingbibliotheque.repositories.livreRepository livreRepository) {
+    public LivreService(LivreRepository livreRepository) {
         this.livreRepository = livreRepository;
     }
 
