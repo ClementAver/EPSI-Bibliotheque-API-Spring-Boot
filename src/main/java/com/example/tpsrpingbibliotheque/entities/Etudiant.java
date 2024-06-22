@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="\"etudiant\"")
+@Table(name="etudiant")
 public class Etudiant extends Membre {
     @Column(name = "niveau", nullable = false)
     private String niveau;

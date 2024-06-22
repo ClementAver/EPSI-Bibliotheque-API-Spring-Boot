@@ -11,6 +11,5 @@ public interface LivreInterface {
     List<Livre> getAllLivres();
     Livre getLivre(int id);
     void deleteLivre(int id);
-    void empruntLivre(int id, boolean emprunt, LivreRequestBody livreRequestBody) throws LivreNonDisponibleExeption;
 }
 

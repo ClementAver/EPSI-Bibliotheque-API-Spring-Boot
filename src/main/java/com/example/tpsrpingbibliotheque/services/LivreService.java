@@ -46,31 +46,18 @@ public class LivreService implements LivreInterface {
         livreRepository.deleteById((long) id);
     }
 
-    @Override
-    public void empruntLivre(int id, boolean emprunt, LivreRequestBody livreRequestBody) throws LivreNonDisponibleExeption {
-        try {
-            Livre livre = livreRepository.findById(id);
-            if (livre == null) throw new LivreNonDisponibleExeption("Livre inconnu.");
-
-            if (emprunt) {
-                if (livre.isDisponible()) {
-                    livre.setDisponible(false);
-                    livreRepository.save(livre);
-                } else {
-                    throw new LivreNonDisponibleExeption("Le livre est déjà emprunté.");
-                }
-            } else {
-                if (!livre.isDisponible()) {
-                    livre.setDisponible(true);
-                    livreRepository.save(livre);
-                } else {
-                    throw new LivreNonDisponibleExeption("Le livre est déjà en rayon.");
-                }
-            }
-        } catch (LivreNonDisponibleExeption e) {
-            System.out.println(e.getMessage());
-        }
-
+    public Livre emprunter(int id, LivreRequestBody livreRequestBody) throws LivreNonDisponibleExeption {
+        Livre livre = livreRepository.findById(id);
+        if (livre == null) throw new LivreNonDisponibleExeption("Livre inconnu.");
+        livre.emprunter(livreRequestBody);
+        return livreRepository.save(livre);
     }
 
+    public String rendre(int id, LivreRequestBody livreRequestBody) throws LivreNonDisponibleExeption {
+        Livre livre = livreRepository.findById(id);
+        if (livre == null) throw new LivreNonDisponibleExeption("Livre inconnu.");
+        String statement = livre.rendre(livreRequestBody);
+        livreRepository.save(livre);
+        return statement;
+    }
 }

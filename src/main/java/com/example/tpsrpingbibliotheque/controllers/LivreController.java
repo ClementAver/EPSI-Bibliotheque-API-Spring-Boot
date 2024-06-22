@@ -15,11 +15,9 @@ public class LivreController {
 
     // @Autowired if no constructor.
     final private LivreService livreService;
-    private final LivreRepository livreRepository;
 
     public LivreController(LivreService livreService, LivreRepository livreRepository) {
         this.livreService = livreService;
-        this.livreRepository = livreRepository;
     }
 
     @GetMapping("/livres")
@@ -42,12 +40,27 @@ public class LivreController {
         livreService.deleteLivre(id);
     }
 
-    @PutMapping("/emprunt/{id}")
-    public void empruntLivre(@RequestBody LivreRequestBody livreRequestBody, @PathVariable int id, @RequestParam(name="emprunt", required = true) boolean emprunt) {
+    @PutMapping("/emprunter/{id}")
+    public void emprunter(@RequestBody LivreRequestBody livreRequestBody, @PathVariable int id) throws Exception {
+        if (livreRequestBody.getInPossessionOf().getEmprunts().size() < 3) {
+            try {
+                livreService.emprunter(id, livreRequestBody);
+            } catch (LivreNonDisponibleExeption e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            throw new Exception("Capacité d'emprunt maximum déjà atteinte.");
+        }
+
+    }
+
+    @PutMapping("/rendre/{id}")
+    public String rendre (@RequestBody LivreRequestBody livreRequestBody, @PathVariable int id) {
         try {
-            livreService.empruntLivre(id, emprunt, livreRequestBody);
+            return livreService.rendre(id, livreRequestBody);
         } catch (LivreNonDisponibleExeption e) {
             System.out.println(e.getMessage());
         }
+        return null;
     }
 }
