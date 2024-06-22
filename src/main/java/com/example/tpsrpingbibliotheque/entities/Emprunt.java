@@ -4,29 +4,28 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reservation {
+@Table(name="Emprunt")
+public class Emprunt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    Long id;
+    private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn(name = "livre")
+    @JoinColumn(name = "livre", nullable = true)
     private Livre livre;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "membre", nullable = false)
+    @JoinColumn(name = "membre", nullable = true)
     private Membre membre;
 
-    @Column(name = "date-reservation", nullable = false)
-    private LocalDate dateReservation;
-
-    @Column(name = "date-expiration", nullable = false)
-    private LocalDate dateExpiration;
+    @Column(name="since")
+    private LocalDate dateEmprunt;
 }

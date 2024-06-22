@@ -13,10 +13,9 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationDTO {
+public class EmpruntDTO {
     private Long id;
     private Livre livre;
     private Membre membre;
-    private LocalDate dateReservation;
-    private LocalDate dateExpiration;
+    private LocalDate dateEmprunt;
 }

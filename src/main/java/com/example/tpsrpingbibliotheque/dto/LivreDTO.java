@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LivreDTO {
-    private String idbook;
+    private Long id;
     private String titre;
     private String auteur;
     private boolean disponible;

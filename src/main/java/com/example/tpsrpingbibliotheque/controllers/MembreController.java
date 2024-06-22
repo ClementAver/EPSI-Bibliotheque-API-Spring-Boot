@@ -1,41 +1,40 @@
 package com.example.tpsrpingbibliotheque.controllers;
 
+import com.example.tpsrpingbibliotheque.dto.MembreDTO;
 import com.example.tpsrpingbibliotheque.dto.MembreRequestBody;
-import com.example.tpsrpingbibliotheque.entities.Membre;
 import com.example.tpsrpingbibliotheque.services.MembreService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api")
 public class MembreController {
 
     // @Autowired if no constructor.
-    final private MembreService
-            membreService;
+    final private MembreService membreService;
 
     public MembreController(MembreService membreService) {
         this.membreService = membreService;
     }
 
     @GetMapping("/membres")
-    public List<Membre> getMembres() {
+    public Stream<MembreDTO> getMembres() {
         return membreService.getAllMembres();
     }
 
     @GetMapping("/membre")
-    public Membre getMembre(@RequestParam(name = "id", required=true) int id) {
+    public MembreDTO getMembre(@RequestParam(name = "id", required=true) Long id) {
         return membreService.getMembre(id);
     }
 
     @PostMapping("/membre")
-    public Membre createMembre(@RequestBody MembreRequestBody membreRequestBody) {
-        return membreService.createMembre(membreRequestBody);
+    public void createMembre(@RequestBody MembreRequestBody membreRequestBody) {
+        membreService.createMembre(membreRequestBody);
     }
 
     @DeleteMapping("/membre")
-    public void deleteMembre(@RequestParam(name = "id", required=true) int id) {
+    public void deleteMembre(@RequestParam(name = "id", required=true) Long id) {
         membreService.deleteMembre(id);
     }
 }

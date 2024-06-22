@@ -1,16 +1,15 @@
 package com.example.tpsrpingbibliotheque.services;
 
+import com.example.tpsrpingbibliotheque.dto.MembreDTO;
 import com.example.tpsrpingbibliotheque.dto.MembreRequestBody;
-import com.example.tpsrpingbibliotheque.entities.Membre;
-import com.example.tpsrpingbibliotheque.repositories.MembreRepository;
-import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.stream.Stream;
 
 public interface MembreInterface {
-    Membre createMembre(MembreRequestBody etudiantRequestBody);
-    Set<Membre> getAllMembres();
-    Membre getMembre(int id);
-    void deleteMembre(int id);
+    Stream<MembreDTO> getAllMembres();
+    MembreDTO getMembre(Long id);
+    void createMembre(MembreRequestBody etudiantRequestBody);
+    void updateMembre(Long id, MembreRequestBody membreRequestBody);
+    void deleteMembre(Long id);
 }
 

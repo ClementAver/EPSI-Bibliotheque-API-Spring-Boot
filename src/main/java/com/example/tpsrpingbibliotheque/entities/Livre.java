@@ -1,6 +1,6 @@
 package com.example.tpsrpingbibliotheque.entities;
 
-import com.example.tpsrpingbibliotheque.dto.LivreRequestBody;
+import com.example.tpsrpingbibliotheque.dto.EmpruntDTO;
 import com.example.tpsrpingbibliotheque.enums.Categorie;
 import com.example.tpsrpingbibliotheque.exeptions.LivreNonDisponibleExeption;
 import com.example.tpsrpingbibliotheque.services.Empruntable;
@@ -8,11 +8,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
-import java.util.Calendar;
 
 @Entity
 @Data
@@ -32,40 +27,32 @@ public class Livre implements Empruntable {
     private String auteur;
 
     @Column(name = "categorie", nullable = false)
-    Categorie categorie;
+    private Categorie categorie;
 
     @Column(name = "disponible")
-    boolean disponible = true;
+    private boolean disponible = true;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @Column(name = "in-possession-off")
-    Membre inPossessionOf;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "emprunt", nullable = true)
+    private Emprunt emprunt;
 
-    @Column(name="since")
-    LocalDate since;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "reservation", nullable = true)
+    private Reservation reservation;
 
     @Override
-    public void emprunter(LivreRequestBody livreRequestBody) throws LivreNonDisponibleExeption {
+    public void emprunter() throws LivreNonDisponibleExeption {
         if (this.isDisponible()) {
             this.setDisponible(false);
-            this.setInPossessionOf(null);
-            this.setSince(Calendar.getInstance().getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         } else {
             throw new LivreNonDisponibleExeption("Le livre est déjà emprunté.");
         }
     }
 
     @Override
-    public String rendre(LivreRequestBody livreRequestBody) throws LivreNonDisponibleExeption {
+    public String rendre() throws LivreNonDisponibleExeption {
         if (!this.isDisponible()) {
             this.setDisponible(true);
-            LocalDate now = Calendar.getInstance().getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            Period period = Period.between(this.since, now);
-            int daysBetween = period.getDays();
-            if (daysBetween > 14) {
-                return "vous avez reçu une pénalité de " + (daysBetween-14);
-            }
-            this.setInPossessionOf(livreRequestBody.getInPossessionOf());
         } else {
             throw new LivreNonDisponibleExeption("Le livre est déjà en rayon.");
         }

@@ -5,9 +5,6 @@ import lombok.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static jakarta.persistence.CascadeType.MERGE;
-import static jakarta.persistence.CascadeType.PERSIST;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -26,10 +23,10 @@ public abstract class Membre {
     private String prenom;
 
     @Column
-    @OneToMany(mappedBy = "id", cascade = {PERSIST, MERGE})
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
     private Set<Livre> emprunts = new LinkedHashSet<>();
 
     @Column
-    @OneToMany(mappedBy = "id", cascade = {PERSIST, MERGE})
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
     private Set<Reservation> reservations = new LinkedHashSet<>();
 }

@@ -1,15 +1,14 @@
 package com.example.tpsrpingbibliotheque.services;
 
-import com.example.tpsrpingbibliotheque.dto.LivreRequestBody;
-import com.example.tpsrpingbibliotheque.entities.Livre;
-import com.example.tpsrpingbibliotheque.exeptions.LivreNonDisponibleExeption;
+import com.example.tpsrpingbibliotheque.dto.LivreDTO;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 public interface LivreInterface {
-    Livre createLivre(LivreRequestBody livreRequestBody);
-    List<Livre> getAllLivres();
-    Livre getLivre(int id);
-    void deleteLivre(int id);
+    Stream<LivreDTO> getAllLivres();
+    LivreDTO getLivre(Long id);
+    void createLivre(LivreDTO livreDTO);
+    void updateLivre(Long id, LivreDTO livreDTO);
+    void deleteLivre(Long id);
 }
 
