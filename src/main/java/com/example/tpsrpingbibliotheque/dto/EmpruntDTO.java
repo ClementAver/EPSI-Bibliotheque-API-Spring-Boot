@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class EmpruntDTO {
     private Long id;
-    private Livre livre;
-    private Membre membre;
+    private Long livre;
+    private Long membre;
     private LocalDate dateEmprunt;
 }

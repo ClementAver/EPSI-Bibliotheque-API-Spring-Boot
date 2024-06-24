@@ -24,7 +24,7 @@ public abstract class Membre {
 
     @Column
     @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
-    private Set<Livre> emprunts = new LinkedHashSet<>();
+    private Set<Emprunt> emprunts = new LinkedHashSet<>();
 
     @Column
     @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)

@@ -1,6 +1,8 @@
 package com.example.tpsrpingbibliotheque.services;
 
 import com.example.tpsrpingbibliotheque.dto.ReservationDTO;
+import com.example.tpsrpingbibliotheque.entities.Livre;
+import com.example.tpsrpingbibliotheque.entities.Membre;
 import com.example.tpsrpingbibliotheque.entities.Reservation;
 import com.example.tpsrpingbibliotheque.mappers.ReservationDTOMapper;
 import com.example.tpsrpingbibliotheque.repositories.ReservationRepository;
@@ -30,16 +32,16 @@ public class ReservationService implements ReservationInterface{
         Optional<Reservation> reservationInDB = reservationRepository.findById(id);
         if (reservationInDB.isPresent()) {
             Reservation reservation = reservationInDB.get();
-            return new ReservationDTO(reservation.getId(), reservation.getLivre(), reservation.getMembre(), reservation.getDateReservation(), reservation.getDateExpiration());
+            return new ReservationDTO(reservation.getId(), reservation.getLivre().getId(), reservation.getMembre().getId(), reservation.getDateReservation(), reservation.getDateExpiration());
         }
         return null;
     }
 
     @Override
-    public void createReservation(ReservationDTO reservationDTO) {
+    public void createReservation(Membre membre, Livre livre) {
         Reservation reservation = new Reservation();
-        reservation.setLivre(reservationDTO.getLivre());
-        reservation.setMembre(reservationDTO.getMembre());
+        reservation.setMembre(membre);
+        reservation.setLivre(livre);
         reservation.setDateReservation(LocalDate.now());
         reservation.setDateExpiration(LocalDate.now().plusDays(14));
         reservationRepository.save(reservation);

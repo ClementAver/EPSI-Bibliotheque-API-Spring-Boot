@@ -10,7 +10,7 @@ import java.util.function.Function;
 public class EmpruntDTOMapper implements Function<Emprunt, EmpruntDTO> {
     @Override
     public EmpruntDTO apply(Emprunt emprunt) {
-        return new EmpruntDTO(emprunt.getId(), emprunt.getLivre(), emprunt.getMembre(), emprunt.getDateEmprunt());
+        return new EmpruntDTO(emprunt.getId(), emprunt.getLivre().getId(), emprunt.getMembre().getId(), emprunt.getDateEmprunt());
     }
 }
 

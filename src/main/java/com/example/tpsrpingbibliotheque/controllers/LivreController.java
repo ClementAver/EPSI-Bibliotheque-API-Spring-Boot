@@ -1,6 +1,9 @@
 package com.example.tpsrpingbibliotheque.controllers;
 
 import com.example.tpsrpingbibliotheque.dto.LivreDTO;
+import com.example.tpsrpingbibliotheque.dto.EmpruntDTO;
+import com.example.tpsrpingbibliotheque.dto.ReservationDTO;
+import com.example.tpsrpingbibliotheque.exeptions.LivreNonDisponibleExeption;
 import com.example.tpsrpingbibliotheque.repositories.LivreRepository;
 import com.example.tpsrpingbibliotheque.services.LivreService;
 import org.springframework.web.bind.annotation.*;
@@ -23,18 +26,33 @@ public class LivreController {
         return livreService.getAllLivres();
     }
 
-    @GetMapping("/livre")
-    public LivreDTO getLivre(@RequestParam(name = "id", required=true) Long id) {
+    @GetMapping("/livres/{id}")
+    public LivreDTO getLivre(@PathVariable Long id) {
         return livreService.getLivre(id);
     }
 
-    @PostMapping("/livre")
+    @PostMapping("/livres")
     public void createLivre(@RequestBody LivreDTO livreDTO) {
         livreService.createLivre(livreDTO);
     }
 
-    @DeleteMapping("/user")
-    public void deleteUser(@RequestParam(name = "id", required=true) Long id) {
+    @DeleteMapping("/livres/{id}")
+    public void deleteUser(@PathVariable Long id) {
         livreService.deleteLivre(id);
+    }
+
+    @PostMapping("livres/emprunter")
+    public void emprunter(@RequestBody EmpruntDTO empruntDTO) throws LivreNonDisponibleExeption {
+        livreService.emprunter(empruntDTO);
+    }
+
+    @PostMapping("livres/rendre")
+    public String rendre(@RequestBody EmpruntDTO empruntDTO) throws LivreNonDisponibleExeption {
+        return livreService.rendre(empruntDTO);
+    }
+
+    @PostMapping("livres/reserver")
+    public void reserver(@RequestBody ReservationDTO reservationDTO) throws LivreNonDisponibleExeption {
+        livreService.reserver(reservationDTO);
     }
 }

@@ -15,8 +15,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ReservationDTO {
     private Long id;
-    private Livre livre;
-    private Membre membre;
+    private Long livre;
+    private Long membre;
     private LocalDate dateReservation;
     private LocalDate dateExpiration;
 }

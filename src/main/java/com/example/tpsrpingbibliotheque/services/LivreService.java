@@ -14,7 +14,11 @@ import com.example.tpsrpingbibliotheque.repositories.EmpruntRepository;
 import com.example.tpsrpingbibliotheque.repositories.LivreRepository;
 import com.example.tpsrpingbibliotheque.repositories.MembreRepository;
 import com.example.tpsrpingbibliotheque.repositories.ReservationRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -32,11 +36,14 @@ public class LivreService implements LivreInterface {
     private final ReservationRepository reservationRepository;
     private final ReservationService reservationService;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public LivreService(LivreRepository livreRepository, EmpruntRepository empruntRepository, ReservationRepository reservationRepository, MembreRepository membreRepository) {
         this.livreRepository = livreRepository;
         this.livreDTOMapper = new LivreDTOMapper();
         this.empruntRepository = empruntRepository;
-        this.empruntService = new EmpruntService(empruntRepository);
+        this.empruntService = new EmpruntService(empruntRepository, livreRepository, membreRepository);
         this.reservationRepository = reservationRepository;
         this.reservationService = new ReservationService(reservationRepository);
         this.membreRepository = membreRepository;
@@ -64,8 +71,7 @@ public class LivreService implements LivreInterface {
         livre.setTitre(livreDTO.getTitre());
         livre.setAuteur(livreDTO.getAuteur());
         livre.setCategorie(Categorie.valueOf(livreDTO.getCategorie()));
-        livre.setDisponible(livreDTO.isDisponible());
-
+        livre.setDisponible(true);
         livreRepository.save(livre);
     }
 
@@ -96,10 +102,10 @@ public class LivreService implements LivreInterface {
     }
 
     public void reserver(ReservationDTO reservationDTO) throws LivreNonDisponibleExeption {
-        Livre livre;
         Membre membre;
+        Livre livre;
 
-        Optional<Livre> livreInDB = livreRepository.findById(reservationDTO.getLivre().getId());
+        Optional<Livre> livreInDB = livreRepository.findById(reservationDTO.getLivre());
         // Le livre est-il en BDD ?
         if (livreInDB.isPresent()) {
             livre = livreInDB.get();
@@ -107,7 +113,7 @@ public class LivreService implements LivreInterface {
             throw new LivreNonDisponibleExeption("Livre inconnu.");
         }
 
-        Optional<Membre> membreInDB = membreRepository.findById(reservationDTO.getMembre().getId());
+        Optional<Membre> membreInDB = membreRepository.findById(reservationDTO.getMembre());
         // Le membre est-il en BDD.
         if (membreInDB.isPresent()) {
             membre = membreInDB.get();
@@ -120,27 +126,28 @@ public class LivreService implements LivreInterface {
             throw new LivreNonDisponibleExeption("Membre inconnu.");
         }
 
-
         Reservation reservationInDB = reservationRepository.findByLivre(livre);
         // Le livre est-il déjà réservé ?
         if (reservationInDB != null) {
             // La réservation est-elle toujours valide (date d'expiration postérieure à la date actuelle) ?
             if (reservationInDB.getDateExpiration().isAfter(LocalDate.now())) {
+                if (reservationInDB.getMembre().equals(membre)) {
+                    throw new LivreNonDisponibleExeption("Vous avez déjà réservé ce livre.");
+                }
                 throw new LivreNonDisponibleExeption("Ce livre est déjà réservé.");
             } else {
                 reservationRepository.delete(reservationInDB);
             }
-
         }
 
-        reservationService.createReservation(reservationDTO);
+        reservationService.createReservation(membre, livre);
     }
 
     public void emprunter(EmpruntDTO empruntDTO) throws LivreNonDisponibleExeption {
         Livre livre;
         Membre membre;
 
-        Optional<Livre> livreInDB = livreRepository.findById(empruntDTO.getLivre().getId());
+        Optional<Livre> livreInDB = livreRepository.findById(empruntDTO.getLivre());
         // Le livre est-il en BDD ?
         if (livreInDB.isPresent()) {
             livre = livreInDB.get();
@@ -148,7 +155,7 @@ public class LivreService implements LivreInterface {
             throw new LivreNonDisponibleExeption("Livre inconnu.");
         }
 
-        Optional<Membre> membreInDB = membreRepository.findById(empruntDTO.getMembre().getId());
+        Optional<Membre> membreInDB = membreRepository.findById(empruntDTO.getMembre());
         // Le membre est-il en BDD.
         if (membreInDB.isPresent()) {
             membre = membreInDB.get();
@@ -165,29 +172,39 @@ public class LivreService implements LivreInterface {
         if (livre.getReservation() != null) {
             // La réservation est-elle encore valable (date d'expiration postérieure à la date actuelle)
             // OU la réservation est-elle au nom du membre souhaitant emprunter ce livre ?
-            if (livre.getReservation().getDateExpiration().isBefore(LocalDate.now()) || Objects.equals(livre.getReservation().getMembre().getId(), empruntDTO.getMembre().getId())) {
+            if (livre.getReservation().getDateExpiration().isBefore(LocalDate.now()) || Objects.equals(livre.getReservation().getMembre().getId(), empruntDTO.getMembre())) {
                 // Si le livre est disponible, il est emprunté.
                 try {
                     livre.emprunter();
-                    empruntService.createEmprunt(empruntDTO);
+                    empruntService.createEmprunt(membre, livre);
                 } catch (LivreNonDisponibleExeption e) {
                     throw new LivreNonDisponibleExeption(e.getMessage());
                 }
-                livreRepository.save(livre);
                 // La réservation est donc supprimée.
                 reservationRepository.delete(livre.getReservation());
             }
             else  {
                 throw new LivreNonDisponibleExeption("Ce livre est déjà réservé.");
             }
+        } else {
+            try {
+                livre.emprunter();
+                empruntService.createEmprunt(membre, livre);
+
+            } catch (LivreNonDisponibleExeption e) {
+                throw new LivreNonDisponibleExeption(e.getMessage());
+            }
+            livreRepository.save(livre);
         }
+        livreRepository.save(livre);
     }
 
+    @Transactional
     public String rendre(EmpruntDTO empruntDTO) throws LivreNonDisponibleExeption {
         String statement = null;
         Livre livre;
 
-        Optional<Livre> livreInDB = livreRepository.findById(empruntDTO.getLivre().getId());
+        Optional<Livre> livreInDB = livreRepository.findById(empruntDTO.getLivre());
         // Le livre est-il en BDD ?
         if (livreInDB.isPresent()) {
             livre = livreInDB.get();
@@ -198,8 +215,11 @@ public class LivreService implements LivreInterface {
         Emprunt emprunt = empruntRepository.findByLivre(livre);
         try {
             livre.rendre();
-            livreRepository.save(livre);
-            empruntRepository.delete(emprunt);
+            empruntRepository.deleteById(emprunt.getId());
+            entityManager.flush();
+            entityManager.clear();
+
+            statement = "Le livre à bien été rendu.";
             Period period = Period.between(empruntDTO.getDateEmprunt(), LocalDate.now());
             int daysBetween = period.getDays();
             if (daysBetween > 14) {

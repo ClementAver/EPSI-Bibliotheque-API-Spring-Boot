@@ -1,12 +1,15 @@
 package com.example.tpsrpingbibliotheque.entities;
 
-import com.example.tpsrpingbibliotheque.dto.EmpruntDTO;
 import com.example.tpsrpingbibliotheque.enums.Categorie;
 import com.example.tpsrpingbibliotheque.exeptions.LivreNonDisponibleExeption;
 import com.example.tpsrpingbibliotheque.services.Empruntable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -16,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Table(name="livre")
 public class Livre implements Empruntable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -32,12 +35,12 @@ public class Livre implements Empruntable {
     @Column(name = "disponible")
     private boolean disponible = true;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "emprunt", nullable = true)
+//    @JoinColumn(name = "emprunt", nullable = true, referencedColumnName = "id")
+    @OneToOne(mappedBy = "livre", cascade = CascadeType.ALL)
     private Emprunt emprunt;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "reservation", nullable = true)
+//    @JoinColumn(name = "reservation", nullable = true, referencedColumnName = "id")
+    @OneToOne(mappedBy = "livre", cascade = {CascadeType.ALL})
     private Reservation reservation;
 
     @Override

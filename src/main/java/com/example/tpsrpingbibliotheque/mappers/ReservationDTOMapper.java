@@ -10,7 +10,7 @@ import java.util.function.Function;
 public class ReservationDTOMapper implements Function<Reservation, ReservationDTO> {
     @Override
     public ReservationDTO apply(Reservation reservation) {
-        return new ReservationDTO(reservation.getId(), reservation.getLivre(), reservation.getMembre(), reservation.getDateReservation(), reservation.getDateExpiration());
+        return new ReservationDTO(reservation.getId(), reservation.getLivre().getId(), reservation.getMembre().getId(), reservation.getDateReservation(), reservation.getDateExpiration());
     }
 }
 

@@ -18,14 +18,14 @@ public class Emprunt {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "livre", nullable = true)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "livre", nullable = false)
     private Livre livre;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "membre", nullable = true)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "membre", nullable = false)
     private Membre membre;
 
-    @Column(name="since")
+    @Column(name="date_emprunt", nullable = false)
     private LocalDate dateEmprunt;
 }
